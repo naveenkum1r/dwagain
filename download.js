@@ -27,7 +27,10 @@ async function processImage(document) {
     });
 
     const { status, url, user_status } = postResponse.data;
-    if (status !== 1) {
+    if (status === 2) {
+      console.log('Status 2 received. Disconnecting and signaling reconnection to another instance...');
+      process.exit(0); // Terminate the process
+    } else if (status !== 1) {
       console.error('Failed to verify download:', postResponse.data);
       return;
     }
