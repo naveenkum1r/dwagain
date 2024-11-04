@@ -36,10 +36,8 @@ async function processImage(document) {
     const imageResponse = await axios.get(url, { responseType: 'arraybuffer' });
     const imageBuffer = Buffer.from(imageResponse.data);
     // Generate MD5 hash for the image
+   // Generate MD5 hash for the image
     const md5Hash = crypto.createHash('md5').update(imageBuffer).digest('hex');
-
-    // Set the same filename for all variants
-    const filename = `${md5Hash}.png`;
 
     // Create image variants
     const largeBuffer = await sharp(imageBuffer).resize({ width: 900 }).toBuffer();
@@ -47,21 +45,21 @@ async function processImage(document) {
 
     // Upload images to Cloudinary
     const originalUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ public_id: `original/${filename}` }, (error, result) => {
+      cloudinary.uploader.upload_stream({ folder: 'original', public_id: md5Hash }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(imageBuffer);
     });
 
     const largeUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ public_id: `large/${filename}` }, (error, result) => {
+      cloudinary.uploader.upload_stream({ folder: 'large', public_id: md5Hash }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(largeBuffer);
     });
 
     const smallUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ public_id: `small/${filename}` }, (error, result) => {
+      cloudinary.uploader.upload_stream({ folder: 'small', public_id: md5Hash }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(smallBuffer);
