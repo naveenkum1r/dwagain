@@ -35,34 +35,33 @@ async function processImage(document) {
     // Download the image
     const imageResponse = await axios.get(url, { responseType: 'arraybuffer' });
     const imageBuffer = Buffer.from(imageResponse.data);
-
     // Generate MD5 hash for the image
     const md5Hash = crypto.createHash('md5').update(imageBuffer).digest('hex');
 
+    // Set the same filename for all variants
+    const filename = `${md5Hash}.png`;
+
     // Create image variants
-    const originalPath = `original/${md5Hash}.png`;
-    const largePath = `large/${md5Hash}.png`;
-    const smallPath = `small/${md5Hash}.png`;
+    const largeBuffer = await sharp(imageBuffer).resize({ width: 900 }).toBuffer();
+    const smallBuffer = await sharp(imageBuffer).resize({ width: 400 }).toBuffer();
 
     // Upload images to Cloudinary
     const originalUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder: 'original' }, (error, result) => {
+      cloudinary.uploader.upload_stream({ public_id: `original/${filename}` }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(imageBuffer);
     });
 
-    const largeBuffer = await sharp(imageBuffer).resize({ width: 900 }).toBuffer();
     const largeUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder: 'large' }, (error, result) => {
+      cloudinary.uploader.upload_stream({ public_id: `large/${filename}` }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(largeBuffer);
     });
 
-    const smallBuffer = await sharp(imageBuffer).resize({ width: 400 }).toBuffer();
     const smallUpload = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder: 'small' }, (error, result) => {
+      cloudinary.uploader.upload_stream({ public_id: `small/${filename}` }, (error, result) => {
         if (error) reject(error);
         else resolve(result);
       }).end(smallBuffer);
