@@ -98,7 +98,7 @@ async function processImages() {
     const db = client.db('db');
     const urlsCollection = db.collection('links');
 
-    const query = { dwagain: { $ne: null, $ne: 'no' }, downloaded: { $ne: null } };
+    const query = { dwagain: { $ne: null, $ne: 'no' }, downloaded: { $eq: null } };
     const cursor = urlsCollection.find(query);
 
     while (await cursor.hasNext()) {
