@@ -26,7 +26,7 @@ async function processImage(document) {
   });
 
   const { status, url, user_status } = postResponse.data;
-  if (status !== 'success') {
+  if (status !== '1') {
     console.error('Failed to verify download:', postResponse.data);
     return;
   }
