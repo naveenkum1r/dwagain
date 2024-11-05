@@ -104,7 +104,7 @@ async function processImages() {
     while (await cursor.hasNext()) {
       const document = await cursor.next();
       await processImage(document);
-      await wait(30000);
+      //await wait(30000);
     }
 
   } catch (error) {
